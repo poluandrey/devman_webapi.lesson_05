@@ -48,7 +48,7 @@ def retrieve_vacation_info_by_language(
         language: str,
         area: str = '2',
         currency: str = 'RUR',
-        only_with_salary: bool = False) -> Dict[str, str]:
+        only_with_salary: bool = False) -> Dict[str, Dict]:
     url = urllib.parse.urljoin(settings.HH_BASE_URL, 'vacancies')
     params = {
         'area': area,
@@ -76,6 +76,6 @@ def retrieve_vacation_info_by_language(
 
 
 if __name__ == '__main__':
-    for language in settings.PROGRAM_LANGUAGE:
+    for language in settings.PROGRAM_LANGUAGES:
         job_info = retrieve_vacation_info_by_language(language=language)
         print(job_info)
