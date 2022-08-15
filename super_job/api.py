@@ -1,8 +1,8 @@
+import urllib.parse
 from itertools import count
 from typing import Dict, List
 
 import requests
-import urllib.parse
 
 import settings
 
@@ -63,9 +63,12 @@ def retrieve_vacation_info_by_language(language: str,
             vacancies_processed += 1
 
     language_info = {}
-    language_info[language] = {'vacancies_found': vacancies_found,
-                      'vacancies_processed': vacancies_processed}
-    language_info[language]['average_salary'] = int(average_salary / vacancies_processed) if vacancies_processed != 0 else 0
+    language_info[language] = {
+        'vacancies_found': vacancies_found,
+        'vacancies_processed': vacancies_processed}
+    language_info[language]['average_salary'] = int(
+        average_salary / vacancies_processed
+    ) if vacancies_processed != 0 else 0
     return language_info
 
 
