@@ -36,8 +36,17 @@ def load_all_vacations(url: str, params: Dict, headers: Dict):
 
 def retrieve_vacations_by_language(programming_language: str,
                                    town: str = '4',
-                                   catalogues: str = '48') -> Dict:
-    keywords: List[Dict] = [{'srws': '1'}, {'keys': programming_language}]
+                                   catalogues: str = '48',
+                                   where2search: str = '1') -> Dict:
+    """
+    :param programming_language:
+    :param town:
+    :param catalogues:
+    :param where2search: 1 -job title, 2 - company name, 3 - official duties
+    :return: vist of vacations
+    """
+    keywords: List[Dict[str, str]] = [{'srws': where2search},
+                                      {'keys': programming_language}]
 
     headers = {'X-Api-App-Id': settings.SJ_SECRET_KEY}
     params = {'town': town,
