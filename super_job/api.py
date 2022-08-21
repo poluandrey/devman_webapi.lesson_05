@@ -52,9 +52,9 @@ def retrieve_vacations_by_language(programming_language: str,
     params = {'town': town,
               'catalogues': catalogues,
               }
-    for id, param in enumerate(keywords):
+    for pk, param in enumerate(keywords):
         for key, value in param.items():
-            params[f'keywords[{id}][{key}]'] = value
+            params[f'keywords[{pk}][{key}]'] = value
     base_url = settings.SJ_BASE_URL
     url = urllib.parse.urljoin(base_url, 'vacancies')
 
