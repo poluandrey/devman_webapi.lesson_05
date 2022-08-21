@@ -1,13 +1,13 @@
 import urllib.parse
 from itertools import count
-from typing import Dict
+from typing import Dict, Optional, Union
 
 import requests
 
 import settings
 
 
-def calculate_vacancies_processed(vacation: Dict):
+def calculate_vacancies_processed(vacation: Dict) -> int:
     salary = vacation['salary']
     if not salary:
         return 0
@@ -29,7 +29,7 @@ def predict_rub_salary(vacation: Dict) -> int:
         return salary_from * 1.2
 
 
-def load_all_vacations(url, params: Dict[str, str]):
+def load_all_vacations(url, params: Dict[str, Union[str, int]]):
     for page in count(start=0, step=1):
         params['page'] = page
         resp = requests.get(url, params=params)
@@ -44,7 +44,7 @@ def load_all_vacations(url, params: Dict[str, str]):
 
 
 def retrieve_vacation_info_by_language(
-        language: str,
+        programming_language: str,
         area: str = '2',
         currency: str = 'RUR',
         only_with_salary: bool = False) -> Dict[str, Dict]:
@@ -53,7 +53,7 @@ def retrieve_vacation_info_by_language(
         'area': area,
         'currency': currency,
         'only_with_salary': only_with_salary,
-        'text': language,
+        'text': programming_language,
     }
     resp = requests.get(url, params=params)
 
@@ -71,7 +71,7 @@ def retrieve_vacation_info_by_language(
         average_salary += predict_rub_salary(vacation)
 
     return {
-        language:
+        programming_language:
             {'vacancies_found': vacancies_found,
              'vacancies_processed': vacancies_processed,
              'average_salary': int(average_salary / vacancies_processed)}}
@@ -79,5 +79,5 @@ def retrieve_vacation_info_by_language(
 
 if __name__ == '__main__':
     for language in settings.PROGRAM_LANGUAGES:
-        job_info = retrieve_vacation_info_by_language(language=language)
+        job_info = retrieve_vacation_info_by_language(programming_language=language)
         print(job_info)

@@ -16,12 +16,12 @@ def create_table(languages: List, func: Callable, title: str):
     ]
 
     for language in languages:
-        vacations_info = func(language)
-        info = vacations_info[language]
+        vacations = func(language)
+        data_by_language = vacations[language]
         row = [language,
-               info['vacancies_found'],
-               info['vacancies_processed'],
-               info['average_salary']]
+               data_by_language['vacancies_found'],
+               data_by_language['vacancies_processed'],
+               data_by_language['average_salary']]
         table.append(row)
     table = AsciiTable(table, title=title)
     return table
@@ -30,7 +30,7 @@ def create_table(languages: List, func: Callable, title: str):
 def main():
     languages = settings.PROGRAM_LANGUAGES
     sj_table = create_table(languages=languages,
-                            func=sj_api.retrieve_vacation_info_by_language,
+                            func=sj_api.retrieve_vacations_by_language,
                             title='SuperJob')
     print(sj_table.table)
     hh_table = create_table(languages=languages,

@@ -34,10 +34,10 @@ def load_all_vacations(url: str, params: Dict, headers: Dict):
         yield from json_object['objects']
 
 
-def retrieve_vacation_info_by_language(language: str,
-                                       town: str = 4,
-                                       catalogues: str = 48) -> Dict:
-    keywords: List[Dict] = [{'srws': 1}, {'keys': language}]
+def retrieve_vacations_by_language(programming_language: str,
+                                   town: str = '4',
+                                   catalogues: str = '48') -> Dict:
+    keywords: List[Dict] = [{'srws': '1'}, {'keys': programming_language}]
 
     headers = {'X-Api-App-Id': settings.SJ_SECRET_KEY}
     params = {'town': town,
@@ -62,11 +62,10 @@ def retrieve_vacation_info_by_language(language: str,
             average_salary += salary
             vacancies_processed += 1
 
-    language_info = {}
-    language_info[language] = {
+    language_info = {programming_language: {
         'vacancies_found': vacancies_found,
-        'vacancies_processed': vacancies_processed}
-    language_info[language]['average_salary'] = int(
+        'vacancies_processed': vacancies_processed}}
+    language_info[programming_language]['average_salary'] = int(
         average_salary / vacancies_processed
     ) if vacancies_processed != 0 else 0
     return language_info
@@ -74,5 +73,5 @@ def retrieve_vacation_info_by_language(language: str,
 
 if __name__ == '__main__':
     for language in settings.PROGRAM_LANGUAGES:
-        language_info = retrieve_vacation_info_by_language(language=language)
+        language_info = retrieve_vacations_by_language(programming_language=language)
         print(language_info)
