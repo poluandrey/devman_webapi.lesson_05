@@ -20,7 +20,7 @@ def predict_rub_salary(vacation: Dict):
     return None
 
 
-def load_all_vacations(url: str, params: Dict, headers: Dict):
+def load_all_vacancies(url: str, params: Dict, headers: Dict):
     for page in count(start=0, step=1):
         params['page'] = page
 
@@ -34,10 +34,10 @@ def load_all_vacations(url: str, params: Dict, headers: Dict):
         yield from json_object['objects']
 
 
-def retrieve_vacations_by_language(programming_language: str,
-                                   town: str = '4',
-                                   catalogues: str = '48',
-                                   where2search: str = '1') -> Dict:
+def retrieve_vacations_statistic_by_language(programming_language: str,
+                                             town: str = '4',
+                                             catalogues: str = '48',
+                                             where2search: str = '1') -> Dict:
     """
     :param programming_language:
     :param town:
@@ -62,25 +62,27 @@ def retrieve_vacations_by_language(programming_language: str,
     resp.raise_for_status()
 
     vacancies_found = resp.json()['total']
-    vacancies = load_all_vacations(url, params=params, headers=headers)
-    average_salary = 0
+    vacancies = load_all_vacancies(url, params=params, headers=headers)
+    predicted_salary = 0
     vacancies_processed = 0
-    for vacation in vacancies:
-        salary = predict_rub_salary(vacation)
+    for vacancy in vacancies:
+        salary = predict_rub_salary(vacancy)
         if salary:
-            average_salary += salary
+            predicted_salary += salary
             vacancies_processed += 1
 
     language_info = {programming_language: {
         'vacancies_found': vacancies_found,
         'vacancies_processed': vacancies_processed}}
-    language_info[programming_language]['average_salary'] = int(
-        average_salary / vacancies_processed
+    # zero division check
+    avg_salary = int(
+        predicted_salary / vacancies_processed
     ) if vacancies_processed != 0 else 0
+    language_info[programming_language]['average_salary'] = avg_salary
     return language_info
 
 
 if __name__ == '__main__':
     for language in settings.PROGRAM_LANGUAGES:
-        language_info = retrieve_vacations_by_language(programming_language=language)
+        language_info = retrieve_vacations_statistic_by_language(programming_language=language)
         print(language_info)

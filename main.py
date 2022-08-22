@@ -30,11 +30,11 @@ def create_table(languages: List, func: Callable, title: str):
 def main():
     languages = settings.PROGRAM_LANGUAGES
     sj_table = create_table(languages=languages,
-                            func=sj_api.retrieve_vacations_by_language,
+                            func=sj_api.retrieve_vacations_statistic_by_language,
                             title='SuperJob')
     print(sj_table.table)
     hh_table = create_table(languages=languages,
-                            func=hh_api.retrieve_vacation_info_by_language,
+                            func=hh_api.retrieve_vacations_statistic_by_language,
                             title='HeadHunter')
     print(hh_table.table)
 

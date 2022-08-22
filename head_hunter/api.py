@@ -1,6 +1,6 @@
 import urllib.parse
 from itertools import count
-from typing import Dict, Optional, Union
+from typing import Dict, Union
 
 import requests
 
@@ -43,7 +43,7 @@ def load_all_vacations(url, params: Dict[str, Union[str, int]]):
         yield from json_object['items']
 
 
-def retrieve_vacation_info_by_language(
+def retrieve_vacations_statistic_by_language(
         programming_language: str,
         area: str = '2',
         currency: str = 'RUR',
@@ -65,19 +65,22 @@ def retrieve_vacation_info_by_language(
     all_vacancies = load_all_vacations('https://api.hh.ru/vacancies',
                                        params=params)
     vacancies_processed = 0
-    average_salary = 0
+    predicted_salary = 0
     for vacation in all_vacancies:
         vacancies_processed += calculate_vacancies_processed(vacation)
-        average_salary += predict_rub_salary(vacation)
-
+        predicted_salary += predict_rub_salary(vacation)
+    if vacancies_processed == 0:
+        vacancies_processed = 1
+    avg_salary = int(predicted_salary / vacancies_processed) if vacancies_processed != 0 else 0
     return {
         programming_language:
             {'vacancies_found': vacancies_found,
              'vacancies_processed': vacancies_processed,
-             'average_salary': int(average_salary / vacancies_processed)}}
+             # zero division check
+             'average_salary': avg_salary}}
 
 
 if __name__ == '__main__':
     for language in settings.PROGRAM_LANGUAGES:
-        job_info = retrieve_vacation_info_by_language(programming_language=language)
+        job_info = retrieve_vacations_statistic_by_language(programming_language=language)
         print(job_info)
