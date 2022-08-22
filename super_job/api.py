@@ -17,11 +17,11 @@ def predict_rub_salary(vacation: Dict):
         return payment_to * 1.2
     elif payment_from:
         return payment_from * 0.8
-    return None
+    return 0
 
 
 def load_all_vacancies(url: str, params: Dict, headers: Dict):
-    for page in count(start=0, step=1):
+    for page in count(start=1, step=1):
         params['page'] = page
 
         resp = requests.get(url, params=params, headers=headers)
@@ -34,14 +34,14 @@ def load_all_vacancies(url: str, params: Dict, headers: Dict):
         yield from json_object['objects']
 
 
-def retrieve_vacations_statistic_by_language(programming_language: str,
+def retrieve_vacancies_statistic_by_language(programming_language: str,
                                              town: str = '4',
                                              catalogues: str = '48',
                                              where2search: str = '1') -> Dict:
     """
-    :param programming_language:
-    :param town:
-    :param catalogues:
+    :param programming_language: language for which statistic will be collect
+    :param town: where to find vacations
+    :param catalogues: type of vacancies
     :param where2search: 1 -job title, 2 - company name, 3 - official duties
     :return: vist of vacations
     """
@@ -61,28 +61,29 @@ def retrieve_vacations_statistic_by_language(programming_language: str,
     resp = requests.get(url, headers=headers, params=params)
     resp.raise_for_status()
 
-    vacancies_found = resp.json()['total']
+    json_object = resp.json()
+    vacancies_found = json_object['total']
     vacancies = load_all_vacancies(url, params=params, headers=headers)
-    predicted_salary = 0
-    vacancies_processed = 0
+    predicted_salary = sum(list(map(predict_rub_salary, json_object['objects'])))
+    vacancies_processed = len([rec for rec in map(predict_rub_salary, json_object['objects']) if rec > 0])
     for vacancy in vacancies:
         salary = predict_rub_salary(vacancy)
         if salary:
             predicted_salary += salary
             vacancies_processed += 1
 
-    language_info = {programming_language: {
+    language_statistic = {programming_language: {
         'vacancies_found': vacancies_found,
         'vacancies_processed': vacancies_processed}}
     # zero division check
     avg_salary = int(
         predicted_salary / vacancies_processed
     ) if vacancies_processed != 0 else 0
-    language_info[programming_language]['average_salary'] = avg_salary
-    return language_info
+    language_statistic[programming_language]['average_salary'] = avg_salary
+    return language_statistic
 
 
 if __name__ == '__main__':
     for language in settings.PROGRAM_LANGUAGES:
-        language_info = retrieve_vacations_statistic_by_language(programming_language=language)
+        language_info = retrieve_vacancies_statistic_by_language(programming_language=language)
         print(language_info)

@@ -30,7 +30,7 @@ def predict_rub_salary(vacation: Dict) -> int:
 
 
 def load_all_vacations(url, params: Dict[str, Union[str, int]]):
-    for page in count(start=0, step=1):
+    for page in count(start=1, step=1):
         params['page'] = page
         resp = requests.get(url, params=params)
         resp.raise_for_status()
@@ -43,7 +43,7 @@ def load_all_vacations(url, params: Dict[str, Union[str, int]]):
         yield from json_object['items']
 
 
-def retrieve_vacations_statistic_by_language(
+def retrieve_vacancies_statistic_by_language(
         programming_language: str,
         area: str = '2',
         currency: str = 'RUR',
@@ -62,10 +62,10 @@ def retrieve_vacations_statistic_by_language(
     json_object = resp.json()
 
     vacancies_found = json_object['found']
-    all_vacancies = load_all_vacations('https://api.hh.ru/vacancies',
+    all_vacancies = load_all_vacations(url,
                                        params=params)
-    vacancies_processed = 0
-    predicted_salary = 0
+    vacancies_processed = sum(list(map(calculate_vacancies_processed,  json_object['items'])))
+    predicted_salary = sum(list(map(predict_rub_salary,  json_object['items'])))
     for vacation in all_vacancies:
         vacancies_processed += calculate_vacancies_processed(vacation)
         predicted_salary += predict_rub_salary(vacation)
@@ -82,5 +82,5 @@ def retrieve_vacations_statistic_by_language(
 
 if __name__ == '__main__':
     for language in settings.PROGRAM_LANGUAGES:
-        job_info = retrieve_vacations_statistic_by_language(programming_language=language)
+        job_info = retrieve_vacancies_statistic_by_language(programming_language=language)
         print(job_info)
