@@ -64,8 +64,11 @@ def retrieve_vacancies_statistic_by_language(programming_language: str,
     json_object = resp.json()
     vacancies_found = json_object['total']
     vacancies = load_all_vacancies(url, params=params, headers=headers)
-    predicted_salary = sum(list(map(predict_rub_salary, json_object['objects'])))
-    vacancies_processed = len([rec for rec in map(predict_rub_salary, json_object['objects']) if rec > 0])
+    predicted_salary = sum(
+        list(map(predict_rub_salary, json_object['objects'])))
+    vacancies_processed = len(
+        [rec for rec in map(predict_rub_salary, json_object['objects'])
+         if rec > 0])
     for vacancy in vacancies:
         salary = predict_rub_salary(vacancy)
         if salary:
@@ -85,5 +88,6 @@ def retrieve_vacancies_statistic_by_language(programming_language: str,
 
 if __name__ == '__main__':
     for language in settings.PROGRAM_LANGUAGES:
-        language_info = retrieve_vacancies_statistic_by_language(programming_language=language)
+        language_info = retrieve_vacancies_statistic_by_language(
+            programming_language=language)
         print(language_info)
