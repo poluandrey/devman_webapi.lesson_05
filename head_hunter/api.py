@@ -61,24 +61,24 @@ def retrieve_vacancies_statistic_by_language(
 
     json_object = resp.json()
 
-    vacancies_found = json_object['found']
+    found_vacancies = json_object['found']
     all_vacancies = load_all_vacations(url,
                                        params=params)
-    vacancies_processed = sum(
+    processed_vacancies = sum(
         list(map(calculate_vacancies_processed,  json_object['items'])))
     predicted_salary = sum(
         list(map(predict_rub_salary,  json_object['items'])))
     for vacation in all_vacancies:
-        vacancies_processed += calculate_vacancies_processed(vacation)
+        processed_vacancies += calculate_vacancies_processed(vacation)
         predicted_salary += predict_rub_salary(vacation)
-    if vacancies_processed == 0:
-        vacancies_processed = 1
+    if processed_vacancies == 0:
+        processed_vacancies = 1
     avg_salary = int(predicted_salary /
-                     vacancies_processed) if vacancies_processed != 0 else 0
+                     processed_vacancies) if processed_vacancies != 0 else 0
     return {
         programming_language:
-            {'vacancies_found': vacancies_found,
-             'vacancies_processed': vacancies_processed,
+            {'vacancies_found': found_vacancies,
+             'processed_vacancies': processed_vacancies,
              'average_salary': avg_salary}}
 
 
