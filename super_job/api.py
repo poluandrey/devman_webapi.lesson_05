@@ -1,3 +1,4 @@
+import functools
 import urllib.parse
 from itertools import count
 from typing import Dict, List
@@ -5,19 +6,7 @@ from typing import Dict, List
 import requests
 
 import settings
-
-
-def predict_rub_salary(vacation: Dict):
-    payment_from = vacation['payment_from']
-    payment_to = vacation['payment_to']
-
-    if all([payment_from, payment_to]):
-        return (payment_from + payment_to) / 2
-    elif payment_to:
-        return payment_to * 1.2
-    elif payment_from:
-        return payment_from * 0.8
-    return 0
+from salary_utils import predict_rub_salary
 
 
 def load_all_vacancies(url: str, params: Dict, headers: Dict):
@@ -27,11 +16,11 @@ def load_all_vacancies(url: str, params: Dict, headers: Dict):
         resp = requests.get(url, params=params, headers=headers)
         resp.raise_for_status()
 
-        json_object = resp.json()
-        if not json_object['more']:
-            break
+        sj_vacancies = resp.json()
 
-        yield from json_object['objects']
+        yield from sj_vacancies['objects']
+        if not sj_vacancies['more']:
+            break
 
 
 def retrieve_vacancies_statistic_by_language(programming_language: str,
@@ -61,16 +50,24 @@ def retrieve_vacancies_statistic_by_language(programming_language: str,
     resp = requests.get(url, headers=headers, params=params)
     resp.raise_for_status()
 
-    json_object = resp.json()
-    vacancies_found = json_object['total']
+    sj_vacancies = resp.json()
+    vacancies_found = sj_vacancies['total']
+
+    predicted_salaries = list(
+        map(functools.partial(predict_rub_salary, vacation_type='super_job'),
+            sj_vacancies['objects']))
+    predicted_salary = sum(predicted_salaries)
+    # vacancies_processed = len(
+    #
+    #     [salary for salary in predicted_salaries if salary > 0])
+    # я не понимаю зачем и как мне избавляться от сравнения с 0 для INT
+    vacancies_processed = sum(map(lambda x: x != 0, predicted_salaries))
+
     vacancies = load_all_vacancies(url, params=params, headers=headers)
-    predicted_salaries = map(predict_rub_salary, json_object['objects'])
-    predicted_salary = sum(list(predicted_salaries))
-    vacancies_processed = len(
-        # я не понимаю зачем и как мне избавляться от сравнения с 0 для INT
-        [salary for salary in predicted_salaries if salary > 0])
+
     for vacancy in vacancies:
-        salary = predict_rub_salary(vacancy)
+        salary = predict_rub_salary(vacation=vacancy,
+                                    vacation_type='super_job')
         if salary:
             predicted_salary += salary
             vacancies_processed += 1
@@ -78,7 +75,6 @@ def retrieve_vacancies_statistic_by_language(programming_language: str,
     language_statistic = {programming_language: {
         'vacancies_found': vacancies_found,
         'vacancies_processed': vacancies_processed}}
-    # zero division check
     avg_salary = int(
         predicted_salary / vacancies_processed
     ) if vacancies_processed != 0 else 0
