@@ -64,11 +64,11 @@ def retrieve_vacancies_statistic_by_language(programming_language: str,
     json_object = resp.json()
     vacancies_found = json_object['total']
     vacancies = load_all_vacancies(url, params=params, headers=headers)
-    predicted_salary = sum(
-        list(map(predict_rub_salary, json_object['objects'])))
+    predicted_salaries = map(predict_rub_salary, json_object['objects'])
+    predicted_salary = sum(list(predicted_salaries))
     vacancies_processed = len(
-        [rec for rec in map(predict_rub_salary, json_object['objects'])
-         if rec > 0])
+        # я не понимаю зачем и как мне избавляться от сравнения с 0 для INT
+        [salary for salary in predicted_salaries if salary > 0])
     for vacancy in vacancies:
         salary = predict_rub_salary(vacancy)
         if salary:

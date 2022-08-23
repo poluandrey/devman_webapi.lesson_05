@@ -17,11 +17,11 @@ def create_table(languages: List, func: Callable, title: str):
 
     for language in languages:
         vacations = func(language)
-        data_by_language = vacations[language]
+        language_statistic = vacations[language]
         row = [language,
-               data_by_language['vacancies_found'],
-               data_by_language['vacancies_processed'],
-               data_by_language['average_salary']]
+               language_statistic['vacancies_found'],
+               language_statistic['vacancies_processed'],
+               language_statistic['average_salary']]
         table.append(row)
     table = AsciiTable(table, title=title)
     return table

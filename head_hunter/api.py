@@ -79,7 +79,6 @@ def retrieve_vacancies_statistic_by_language(
         programming_language:
             {'vacancies_found': vacancies_found,
              'vacancies_processed': vacancies_processed,
-             # zero division check
              'average_salary': avg_salary}}
 
 
