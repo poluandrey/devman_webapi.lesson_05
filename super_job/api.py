@@ -68,13 +68,16 @@ def retrieve_vacancies_statistic_by_language(programming_language: str,
             predicted_salary += salary
             vacancies_processed += 1
 
-    language_statistic = {programming_language: {
-        'vacancies_found': vacancies_found,
-        'vacancies_processed': vacancies_processed}}
     avg_salary = int(
         predicted_salary / vacancies_processed
     ) if vacancies_processed != 0 else 0
-    language_statistic[programming_language]['average_salary'] = avg_salary
+
+    language_statistic = {programming_language: {
+        'vacancies_found': vacancies_found,
+        'vacancies_processed': vacancies_processed},
+        'average_salary': avg_salary
+    }
+
     return language_statistic
 
 
