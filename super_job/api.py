@@ -57,11 +57,7 @@ def retrieve_vacancies_statistic_by_language(programming_language: str,
         map(functools.partial(predict_rub_salary, vacation_type='super_job'),
             sj_vacancies['objects']))
     predicted_salary = sum(predicted_salaries)
-    # vacancies_processed = len(
-    #
-    #     [salary for salary in predicted_salaries if salary > 0])
-    # я не понимаю зачем и как мне избавляться от сравнения с 0 для INT
-    vacancies_processed = sum(map(lambda x: x != 0, predicted_salaries))
+    vacancies_processed = sum(map(lambda x: not x, predicted_salaries))
 
     vacancies = load_all_vacancies(url, params=params, headers=headers)
 

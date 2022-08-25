@@ -6,13 +6,13 @@ def predict_rub_salary(vacation: Dict, vacation_type) -> int:
     salary_to = None
     if vacation_type == 'head_hunter':
         salary = vacation['salary']
-        if salary is None:
+        if not salary:
             return 0
         salary_from, salary_to = salary['from'], salary['to']
     elif vacation_type == 'super_job':
         salary_from = vacation['payment_from']
         salary_to = vacation['payment_to']
-    if salary_from is None and salary_to is None:
+    if not salary_from and not salary_to:
         return 0
     elif all([salary_from, salary_to]):
         return (salary_from + salary_to) / 2

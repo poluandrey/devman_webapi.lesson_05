@@ -63,7 +63,7 @@ def retrieve_vacancies_statistic_by_language(
                                                vacation_type='head_hunter')
 
     avg_salary = int(predicted_salary /
-                     processed_vacancies) if processed_vacancies != 0 else 0
+                     processed_vacancies) if processed_vacancies else 0
     return {
         programming_language:
             {'vacancies_found': found_vacancies,
