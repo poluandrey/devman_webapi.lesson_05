@@ -51,13 +51,13 @@ def retrieve_vacancies_statistic_by_language(programming_language: str,
     resp.raise_for_status()
 
     sj_vacancies = resp.json()
-    vacancies_found = sj_vacancies['total']
+    found_vacancies = sj_vacancies['total']
 
     predicted_salaries = list(
         map(functools.partial(predict_rub_salary, vacation_type='super_job'),
             sj_vacancies['objects']))
     predicted_salary = sum(predicted_salaries)
-    vacancies_processed = sum(map(lambda x: not x, predicted_salaries))
+    processed_vacancies = sum(map(lambda x: not x, predicted_salaries))
 
     vacancies = load_all_vacancies(url, params=params, headers=headers)
 
@@ -66,15 +66,15 @@ def retrieve_vacancies_statistic_by_language(programming_language: str,
                                     vacation_type='super_job')
         if salary:
             predicted_salary += salary
-            vacancies_processed += 1
+            processed_vacancies += 1
 
     avg_salary = int(
-        predicted_salary / vacancies_processed
-    ) if vacancies_processed != 0 else 0
+        predicted_salary / processed_vacancies
+    ) if processed_vacancies != 0 else 0
 
     language_statistic = {programming_language: {
-        'vacancies_found': vacancies_found,
-        'vacancies_processed': vacancies_processed},
+        'vacancies_found': found_vacancies,
+        'vacancies_processed': processed_vacancies},
         'average_salary': avg_salary
     }
 
@@ -83,6 +83,6 @@ def retrieve_vacancies_statistic_by_language(programming_language: str,
 
 if __name__ == '__main__':
     for language in settings.PROGRAM_LANGUAGES:
-        language_info = retrieve_vacancies_statistic_by_language(
+        language_statistic = retrieve_vacancies_statistic_by_language(
             programming_language=language)
-        print(language_info)
+        print(language_statistic)

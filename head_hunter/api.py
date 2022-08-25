@@ -73,6 +73,6 @@ def retrieve_vacancies_statistic_by_language(
 
 if __name__ == '__main__':
     for language in settings.PROGRAM_LANGUAGES:
-        job_info = retrieve_vacancies_statistic_by_language(
+        language_statistic = retrieve_vacancies_statistic_by_language(
             programming_language=language)
-        print(job_info)
+        print(language_statistic)
