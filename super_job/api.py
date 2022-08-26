@@ -70,7 +70,7 @@ def retrieve_vacancies_statistic_by_language(programming_language: str,
 
     avg_salary = int(
         predicted_salary / processed_vacancies
-    ) if processed_vacancies != 0 else 0
+    ) if processed_vacancies else 0
 
     language_statistic = {programming_language: {
         'vacancies_found': found_vacancies,
